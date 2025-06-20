@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * TransactionQuery
@@ -27,4 +28,9 @@ public class TransactionQuery {
     private Integer pageNo;
 
     private Integer pageSize;
+
+    public void initPageParam() {
+        pageNo = Optional.ofNullable(pageNo).orElse(1);
+        pageSize = Optional.ofNullable(pageSize).orElse(10);
+    }
 }

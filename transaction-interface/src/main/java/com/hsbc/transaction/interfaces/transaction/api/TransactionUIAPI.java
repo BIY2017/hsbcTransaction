@@ -1,5 +1,6 @@
 package com.hsbc.transaction.interfaces.transaction.api;
 
+import com.hsbc.tansaction.domian.transaction.query.TransactionQuery;
 import com.hsbc.transaction.application.transaction.service.TransactionAppService;
 import com.hsbc.transaction.interfaces.transaction.converter.CreateTransactionRequestToEntityConverter;
 import com.hsbc.transaction.interfaces.transaction.converter.ModifyTransactionRequestToEntityConverter;
@@ -38,20 +39,23 @@ public class TransactionUIAPI {
 
     @GetMapping("/v1/transactions")
     public MyResult<MyPage<TransactionDTO>> getTransactionsByQuery(TransactionQueryDTO transactionQueryDTO) {
-        return MyResult.success(transactionAppService.getTransactionsByQuery(TransactionQueryDTOToQueryConverter.INSTANCE.convert(transactionQueryDTO))
+        TransactionQuery query = TransactionQueryDTOToQueryConverter.INSTANCE.convert(transactionQueryDTO);
+        query.initPageParam();
+        return MyResult.success(transactionAppService.getTransactionsByQuery(query)
                 .convert(TransactionToDTOConverter.INSTANCE::convert));
     }
 
     @DeleteMapping("/v1/transactions/{transactionId}")
     public MyResult<Void> removeTransaction(@PathVariable Long transactionId) {
-        transactionAppService.removeTransaction(transactionId);
+        transactionAppService.removeTransaction(String.valueOf(transactionId), transactionId);
         return MyResult.success();
     }
 
     @PostMapping("/v1/transactions")
     public MyResult<TransactionDTO> modifyTransaction(@RequestBody ModifyTransactionRequest modifyTransactionRequest) {
         return MyResult.success(TransactionToDTOConverter.INSTANCE.convert(transactionAppService
-                .modifyTransaction(ModifyTransactionRequestToEntityConverter.INSTANCE.convert(modifyTransactionRequest))));
+                .modifyTransaction(modifyTransactionRequest.getTransactionId(),
+                        ModifyTransactionRequestToEntityConverter.INSTANCE.convert(modifyTransactionRequest))));
     }
 
 }

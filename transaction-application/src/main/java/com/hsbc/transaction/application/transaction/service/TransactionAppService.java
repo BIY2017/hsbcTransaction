@@ -29,11 +29,13 @@ public class TransactionAppService {
                 .createTransaction(transaction));
     }
 
-    public Transaction modifyTransaction(Transaction transaction) {
+    @MyLock(lockKey = "#lockKey")
+    public Transaction modifyTransaction(String lockKey, Transaction transaction) {
         return transactionRepository.modifyTransaction(transaction);
     }
 
-    public int removeTransaction(Long transactionId) {
+    @MyLock(lockKey = "#lockKey")
+    public int removeTransaction(String lockKey, Long transactionId) {
         return transactionRepository.removeTransaction(transactionId);
     }
 
