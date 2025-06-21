@@ -4,13 +4,13 @@
 3. 查询支持分页查询
 
 
-
 # 引用的组件
-* redisson
-* mapstruct
+* spring boot 3.5.0
+* redisson 3.50.0
+* mapstruct 1.5.3.Final
+* commons-collections-4 4.4
+* commons-lang3 3.12.0
 * lombok
-* commons-collections4
-* commons-lang3
 * spring mvc
 * spring aop
 * spring validation
