@@ -1,8 +1,10 @@
 package com.hsbc.transaction.interfaces.transaction.converter;
 
-import com.hsbc.tansaction.domian.transaction.entity.Transaction;
+import com.hsbc.transaction.domian.transaction.entity.Transaction;
+import com.hsbc.transaction.domian.transaction.entity.enmus.TransactionType;
 import com.hsbc.transaction.interfaces.transaction.dto.CreateTransactionRequest;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -16,5 +18,10 @@ public interface CreateTransactionRequestToEntityConverter {
 
     CreateTransactionRequestToEntityConverter INSTANCE = Mappers.getMapper(CreateTransactionRequestToEntityConverter.class);
 
-    Transaction converter(CreateTransactionRequest createTransactionRequest);
+    @Mapping(target = "transactionType", expression = "java(convertTransactionType(createTransactionRequest))")
+    Transaction convert(CreateTransactionRequest createTransactionRequest);
+
+    default TransactionType convertTransactionType(CreateTransactionRequest createTransactionRequest) {
+        return TransactionType.getByCode(createTransactionRequest.getTransactionType());
+    }
 }

@@ -1,10 +1,15 @@
 package com.hsbc.transaction.application.transaction.service;
 
-import com.hsbc.tansaction.domian.transaction.entity.Transaction;
-import com.hsbc.tansaction.domian.transaction.query.TransactionQuery;
-import com.hsbc.tansaction.domian.transaction.repository.TransactionRepository;
-import com.hsbc.tansaction.domian.transaction.service.TransactionService;
+import com.hsbc.transaction.domian.account.entity.Account;
+import com.hsbc.transaction.domian.account.service.AccountService;
+import com.hsbc.transaction.domian.transaction.entity.Transaction;
+import com.hsbc.transaction.domian.transaction.query.TransactionQuery;
+import com.hsbc.transaction.domian.transaction.repository.TransactionRepository;
+import com.hsbc.transaction.domian.transaction.service.TransactionService;
+import com.hsbc.transaction.domian.transaction.validator.TransactionValidator;
+import com.hsbc.transaction.util.annotation.Idempotent;
 import com.hsbc.transaction.util.annotation.MyLock;
+import com.hsbc.transaction.util.context.AppContext;
 import com.hsbc.transaction.util.response.MyPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,27 +24,78 @@ import org.springframework.stereotype.Service;
 public class TransactionAppService {
 
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionValidator transactionValidator;
 
     @Autowired
     private TransactionService transactionService;
 
-    public Transaction createTransaction(Transaction transaction) {
-        return transactionRepository.createTransaction(transactionService
-                .createTransaction(transaction));
+    @Autowired
+    private AccountService accountService;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    /**
+     * 创建交易（防重复提交，防并发操作）
+     *
+     * @param lockKey 加锁键（accountId）
+     * @param transaction 待创建的交易
+     * @return 创建的交易
+     */
+    @MyLock(lockKey = "#lockKey")
+    @Idempotent
+    public Transaction createTransaction(String lockKey, Transaction transaction) {
+        preProcess(transaction);
+        transactionValidator.validateCreate(transaction);
+        accountService.doTransaction(transaction.getAccount(), transaction.getTransactionType(), transaction.getAmount());
+        return transactionService.createTransaction(transaction);
     }
 
+    private void preProcess(Transaction transaction) {
+        Account currentAccount = accountService.getCurrentAccount();
+        transaction.setAccount(currentAccount);
+        transaction.setAccountId(currentAccount.getAccountId());
+    }
+
+    /**
+     * 更新交易（防并发操作）
+     *
+     * @param lockKey 加锁键（accountId）
+     * @param transaction 待更新的交易
+     * @return 更新后的交易
+     */
     @MyLock(lockKey = "#lockKey")
     public Transaction modifyTransaction(String lockKey, Transaction transaction) {
+        preProcess(transaction);
+        Transaction existedTransaction = transactionRepository.getTransactionById(AppContext.getAccountId(), transaction.getTransactionId());
+        transactionValidator.validateTransactionExist(existedTransaction);
+        accountService.doTransaction(accountService.getCurrentAccount(), transaction.getTransactionType(), existedTransaction.getAmount()
+                .subtract(transaction.getAmount()));
         return transactionRepository.modifyTransaction(transaction);
     }
 
+    /**
+     * 删除交易（防并发操作）
+     *
+     * @param lockKey 加锁键（accountId）
+     * @param transactionId 交易主键
+     */
     @MyLock(lockKey = "#lockKey")
-    public int removeTransaction(String lockKey, Long transactionId) {
-        return transactionRepository.removeTransaction(transactionId);
+    public void removeTransaction(String lockKey, Long transactionId) {
+        Transaction transaction = transactionRepository.getTransactionById(AppContext.getAccountId(), transactionId);
+        transactionValidator.validateTransactionExist(transaction);
+        accountService.doTransaction(accountService.getCurrentAccount(), transaction.getTransactionType(), transaction.getAmount());
+        transactionRepository.removeTransaction(transactionId);
     }
 
+    /**
+     * 功能描述:
+     *
+     * @param transactionQuery
+     * @return 分页查询结果
+     */
     public MyPage<Transaction> getTransactionsByQuery(TransactionQuery transactionQuery) {
+        transactionQuery.setAccountId(AppContext.getAccountId());
         return transactionRepository.getTransactionsByQuery(transactionQuery);
     }
 }

@@ -3,6 +3,7 @@ package com.hsbc.transaction.util.aop;
 import com.hsbc.transaction.util.annotation.MyLock;
 import com.hsbc.transaction.util.exception.ErrorCode;
 import com.hsbc.transaction.util.exception.MyException;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,13 +24,14 @@ import java.lang.reflect.Method;
 import java.util.concurrent.TimeUnit;
 
 /**
- * MyLockAspect
+ * 加锁切面
  *
  * @author Lei
  * @date 2025/6/19 19:19
  */
 @Component
 @Aspect
+@Slf4j
 public class MyLockAspect {
 
     @Autowired
@@ -57,7 +59,10 @@ public class MyLockAspect {
             } else {
                 throw new MyException(ErrorCode.SYSTEM_ERROR);
             }
+        } catch (MyException e) {
+            throw e;
         } catch (Throwable throwable) {
+            log.error(" System Error!", throwable);
             throw new MyException(ErrorCode.SYSTEM_ERROR);
         } finally {
             lock.unlock();

@@ -14,17 +14,35 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorCode {
 
-    // 一切OK
+    /**
+     * 成功
+     */
     SUCCESS("00000", "成功"),
 
+    /**
+     * 系统执行错误
+     */
+    SYSTEM_ERROR("00001", "系统执行错误"),
+
+    /**
+     * 可用余额不足
+     */
     AMOUNT_NOT_SUFFICIENT("A0001", "可用余额不足"),
 
+    /**
+     * 重复请求
+     */
     REPEAT_REQUEST("C0001", "重复请求"),
 
-    ILLEGAL_REQUEST("C0002", "重复请求"),
+    /**
+     * 非法请求
+     */
+    ILLEGAL_REQUEST("C0002", "非法请求"),
 
-    SYSTEM_ERROR("B0001", "系统执行错误");
-
+    /**
+     * 交易不存在
+     */
+    TRANSACTION_NOT_EXIST("C0003", "交易不存在");
 
     private final String code;
 

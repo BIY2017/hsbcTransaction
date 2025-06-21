@@ -1,9 +1,14 @@
 package com.hsbc.transaction.interfaces.transaction.dto;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 /**
  * CreateTransactionRequest
@@ -16,15 +21,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateTransactionRequest {
 
-    private String accountId;
+    @NotNull(message = "金额不能为空")
+    @DecimalMin(value = "0", inclusive = false, message = "金额必须大于0")
+    private BigDecimal amount;
 
-    @NotBlank(message = "交易金额不能空")
-    private String amount;
-
+    /**
+     * 关联账户id
+     */
     private String relationAccountId;
 
+    /**
+     * 备注
+     */
     private String remark;
 
-    @NotBlank(message = "交易类型不能为空")
-    private String transactionType;
+    @NotNull(message = "交易类型不能为空")
+    private Integer transactionType;
 }

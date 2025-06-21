@@ -16,7 +16,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
- * IdempotentAspect
+ * 防重复提交切面
  *
  * @author Lei
  * @date 2025/6/19 20:26

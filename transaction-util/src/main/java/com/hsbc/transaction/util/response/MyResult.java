@@ -39,6 +39,10 @@ public class MyResult<T> {
         return new MyResult<>(errorCode.getCode(), errorCode.getMessage());
     }
 
+    public static MyResult<Void> error(String errorCode, String errorMessage) {
+        return new MyResult<>(errorCode, errorMessage);
+    }
+
 
     private MyResult(String code, String message, T data) {
         this.code = code;

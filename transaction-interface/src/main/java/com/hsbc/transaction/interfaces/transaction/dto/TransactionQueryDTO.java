@@ -18,7 +18,13 @@ import lombok.Setter;
 @Setter
 public class TransactionQueryDTO {
 
+    /**
+     * 页码
+     */
     private Integer pageNo;
 
+    /**
+     * 分页大小
+     */
     private Integer pageSize;
 }

@@ -1,7 +1,9 @@
 package com.hsbc.transaction.application.support;
 
+import com.hsbc.transaction.domian.support.constant.CommonConstants;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -16,14 +18,23 @@ import java.util.UUID;
 @Service
 public class TokenSupportAppService {
 
+    private static final String IDEMP_TOKEN_PREFIX = "idemp:";
+
+    @Value("${custom.idemp-token.expire-time}")
+    private Long expireTime;
+
     @Autowired
     private RedissonClient redissonClient;
 
+    /**
+     * 生成防重复提交token
+     *
+     * @return 防重复提交token
+     */
     public String generateIdempotent() {
-        String token = "idemp:" + UUID.randomUUID();
-        // 预存储在Redis中，标记为可用状态
+        String token = IDEMP_TOKEN_PREFIX + UUID.randomUUID();
         redissonClient.getBucket(token)
-                .set("VALID", Duration.ofMinutes(30L));
+                .set(CommonConstants.REDISSON_VALID, Duration.ofMinutes(expireTime));
         return token;
     }
 }

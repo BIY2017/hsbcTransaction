@@ -1,6 +1,6 @@
 package com.hsbc.transaction.interfaces.transaction.converter;
 
-import com.hsbc.tansaction.domian.transaction.query.TransactionQuery;
+import com.hsbc.transaction.domian.transaction.query.TransactionQuery;
 import com.hsbc.transaction.interfaces.transaction.dto.TransactionQueryDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;

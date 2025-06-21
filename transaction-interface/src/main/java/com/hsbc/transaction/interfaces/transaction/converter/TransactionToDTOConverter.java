@@ -1,8 +1,9 @@
 package com.hsbc.transaction.interfaces.transaction.converter;
 
-import com.hsbc.tansaction.domian.transaction.entity.Transaction;
+import com.hsbc.transaction.domian.transaction.entity.Transaction;
 import com.hsbc.transaction.interfaces.transaction.dto.TransactionDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 /**
@@ -17,5 +18,6 @@ public interface TransactionToDTOConverter {
 
     TransactionToDTOConverter INSTANCE = Mappers.getMapper(TransactionToDTOConverter.class);
 
+    @Mapping(source = "transactionTime", target = "transactionTime", dateFormat = "yyyy-MM-dd HH:mm:ss")
     TransactionDTO convert(Transaction transaction);
 }
