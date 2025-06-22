@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Objects;
+
 /**
  * MyException
  *
@@ -21,5 +23,18 @@ public class MyException extends RuntimeException {
     public MyException(ErrorCode errorCode) {
         super(errorCode.getMessage());
         this.errorCode = errorCode;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyException that = (MyException) o;
+        return errorCode == that.errorCode;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(errorCode);
     }
 }

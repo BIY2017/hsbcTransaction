@@ -2,12 +2,9 @@ package com.hsbc.transaction.domian.transaction.validator;
 
 import com.hsbc.transaction.domian.transaction.entity.Transaction;
 import com.hsbc.transaction.domian.transaction.entity.enmus.TransactionType;
-import com.hsbc.transaction.domian.transaction.repository.TransactionRepository;
-import com.hsbc.transaction.util.context.AppContext;
 import com.hsbc.transaction.util.exception.ErrorCode;
 import com.hsbc.transaction.util.exception.MyException;
 import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -25,15 +22,12 @@ import java.util.function.Consumer;
 @Service
 public class TransactionValidator {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
-
     private final Map<TransactionType, Consumer<Transaction>> createTransactionTypeToValidatorMap = new HashMap<>();
 
     private final Map<TransactionType, BiConsumer<Transaction, Transaction>> modifyTransactionTypeToValidatorMap = new HashMap<>();
 
     @PostConstruct
-    private void initValidatorMap() {
+    public void initValidatorMap() {
         createTransactionTypeToValidatorMap.put(TransactionType.DEPOSIT, this::validateDepositCreate);
         createTransactionTypeToValidatorMap.put(TransactionType.WITHDRAWAL, this::validateWithdrawCreate);
 
@@ -88,6 +82,7 @@ public class TransactionValidator {
      * @param oldTransaction 旧交易
      */
     public void validateModify(Transaction newTransaction, Transaction oldTransaction) {
+        validateTransactionExist(oldTransaction);
         modifyTransactionTypeToValidatorMap.get(newTransaction.getTransactionType()).accept(newTransaction, oldTransaction);
     }
 

@@ -1,20 +1,12 @@
 package com.hsbc.transaction.domian.transaction.service;
 
-import com.hsbc.transaction.domian.account.repository.AccountRepository;
-import com.hsbc.transaction.domian.transaction.TransactionConstants;
+import com.hsbc.transaction.domian.transaction.constant.TransactionConstants;
 import com.hsbc.transaction.domian.transaction.entity.Transaction;
-import com.hsbc.transaction.domian.transaction.entity.enmus.TransactionType;
 import com.hsbc.transaction.domian.transaction.repository.TransactionRepository;
-import jakarta.annotation.PostConstruct;
-import org.redisson.Redisson;
 import org.redisson.api.RIdGenerator;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Consumer;
 
 /**
  * TransactionService
@@ -42,6 +34,7 @@ public class TransactionService {
         transaction.create();
         RIdGenerator idGenerator = redissonClient.getIdGenerator(TransactionConstants.TRANSACTION_ID_NAME);
         transaction.setTransactionId(idGenerator.nextId());
-        return transactionRepository.createTransaction(transaction);
+        transactionRepository.createTransaction(transaction);
+        return transaction;
     }
 }

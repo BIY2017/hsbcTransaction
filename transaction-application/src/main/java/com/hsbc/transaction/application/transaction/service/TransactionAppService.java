@@ -48,7 +48,8 @@ public class TransactionAppService {
         preProcess(transaction);
         transactionValidator.validateCreate(transaction);
         accountService.doTransaction(transaction.getAccount(), transaction.getTransactionType(), transaction.getAmount());
-        return transactionService.createTransaction(transaction);
+        transactionService.createTransaction(transaction);
+        return transaction;
     }
 
     private void preProcess(Transaction transaction) {
@@ -68,10 +69,11 @@ public class TransactionAppService {
     public Transaction modifyTransaction(String lockKey, Transaction transaction) {
         preProcess(transaction);
         Transaction existedTransaction = transactionRepository.getTransactionById(AppContext.getAccountId(), transaction.getTransactionId());
-        transactionValidator.validateTransactionExist(existedTransaction);
+        transactionValidator.validateModify(transaction, existedTransaction);
         accountService.doTransaction(accountService.getCurrentAccount(), transaction.getTransactionType(), existedTransaction.getAmount()
                 .subtract(transaction.getAmount()));
-        return transactionRepository.modifyTransaction(transaction);
+        transactionRepository.modifyTransaction(transaction);
+        return transaction;
     }
 
     /**
@@ -89,9 +91,9 @@ public class TransactionAppService {
     }
 
     /**
-     * 功能描述:
+     * 分页查询交易列表
      *
-     * @param transactionQuery
+     * @param transactionQuery 查询条件
      * @return 分页查询结果
      */
     public MyPage<Transaction> getTransactionsByQuery(TransactionQuery transactionQuery) {

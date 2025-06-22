@@ -1,4 +1,4 @@
-package com.hsbc.transaction.domian.transaction;
+package com.hsbc.transaction.domian.transaction.constant;
 
 /**
  * TransactionConstants

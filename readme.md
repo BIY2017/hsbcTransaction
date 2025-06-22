@@ -14,3 +14,5 @@
 * spring mvc
 * spring aop
 * spring validation
+* junit5
+* mockito
