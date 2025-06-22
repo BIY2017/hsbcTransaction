@@ -1,6 +1,7 @@
 package com.hsbc.transaction.util.aop;
 
 import com.hsbc.transaction.util.annotation.Idempotent;
+import com.hsbc.transaction.util.constant.CommonConstants;
 import com.hsbc.transaction.util.exception.ErrorCode;
 import com.hsbc.transaction.util.exception.MyException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,6 +41,9 @@ public class IdempotentAspect {
         String token = request.getHeader("idemp-token");
         if (StringUtils.isEmpty(token)) {
             throw new MyException(ErrorCode.ILLEGAL_REQUEST);
+        }
+        if (System.currentTimeMillis() > Long.parseLong(token.split(CommonConstants.COLON)[2])) {
+            throw new MyException(ErrorCode.TOKEN_EXPIRED);
         }
         // 构造Redis的key
         RBucket<String> bucket = redissonClient.getBucket(token);

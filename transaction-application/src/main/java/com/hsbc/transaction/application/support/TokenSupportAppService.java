@@ -1,6 +1,6 @@
 package com.hsbc.transaction.application.support;
 
-import com.hsbc.transaction.domian.support.constant.CommonConstants;
+import com.hsbc.transaction.util.constant.CommonConstants;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,9 +32,13 @@ public class TokenSupportAppService {
      * @return 防重复提交token
      */
     public String generateIdempotent() {
-        String token = IDEMP_TOKEN_PREFIX + UUID.randomUUID();
+        String token = IDEMP_TOKEN_PREFIX + UUID.randomUUID() + CommonConstants.COLON + calExpiredTime();
         redissonClient.getBucket(token)
                 .set(CommonConstants.REDISSON_VALID, Duration.ofMinutes(expireTime));
         return token;
+    }
+
+    private long calExpiredTime () {
+        return System.currentTimeMillis() + 30 * 60 * 1000;
     }
 }

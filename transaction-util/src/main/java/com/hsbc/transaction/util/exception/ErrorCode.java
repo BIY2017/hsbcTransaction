@@ -42,7 +42,12 @@ public enum ErrorCode {
     /**
      * 交易不存在
      */
-    TRANSACTION_NOT_EXIST("C0003", "交易不存在");
+    TRANSACTION_NOT_EXIST("C0003", "交易不存在"),
+
+    /**
+     * token过期
+     */
+    TOKEN_EXPIRED("C0004", "token过期，请刷新页面");
 
     private final String code;
 
